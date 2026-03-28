@@ -3,58 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliant Facebook Group Manager</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 0 20px; }
-        #status { margin-bottom: 20px; padding: 10px; background-color: #f0f0f0; border: 1px solid #ddd; }
-        #login-button { background-color: #4267B2; color: white; padding: 10px 15px; border: none; cursor: pointer; font-size: 16px; }
-        #post-area { display: none; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
-        textarea { width: 100%; height: 120px; margin-bottom: 10px; padding: 10px; border: 1px solid #ccc; }
-        .group-list { margin-top: 15px; max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 10px; background-color: #f9f9f9; }
-        .group-item { margin-bottom: 5px; }
-        .post-button { background-color: #1877F2; color: white; padding: 12px 20px; border: none; cursor: pointer; font-size: 17px; margin-top: 20px; }
-        .message-log { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
-        .success { color: green; }
-        .error { color: red; }
-    </style>
+    <title>FB Group Auto-Poster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-900 text-white min-h-screen font-sans">
 
-    <h1>Compliant Facebook Group Manager</h1>
-    <p>
-        <strong>IMPORTANT:</strong> This app is for posting to Facebook Groups you *manage* (are an administrator of) and requires explicit manual selection.
-        Automated mass-posting to unmanaged groups is against Facebook policy and will lead to account bans.
-    </p>
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-blue-500 mb-2">FB Auto-Post Concept</h1>
+            <p class="text-slate-400">Automate your outreach every 2 hours</p>
+        </header>
 
-    <div id="status">
-        <p>Please log in to manage your groups.</p>
-        <button id="login-button" onclick="login()">Login with Facebook</button>
-    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Left Column: Settings -->
+            <div class="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-cog mr-2"></i> Configuration
+                </h2>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Facebook Message</label>
+                    <textarea id="postMessage" rows="4" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Enter your post content here..."></textarea>
+                </div>
 
-    <div id="post-area">
-        <h2>Post a Message to Your Managed Groups</h2>
-        <textarea id="post-message" placeholder="Enter your message here..."></textarea>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Group Links (One per line)</label>
+                    <textarea id="groupLinks" rows="6" class="w-full bg-slate-700 border border-slate-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://facebook.com/groups/12345..."></textarea>
+                </div>
 
-        <div class="group-list">
-            <h3>Select Groups to Post To:</h3>
-            <p id="loading-groups">Loading managed groups...</p>
-            <div id="managed-groups">
-                <!-- Managed groups will be loaded here -->
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <span class="text-sm text-slate-400">Interval:</span>
+                        <span class="bg-blue-900 text-blue-200 px-2 py-1 rounded text-xs ml-2">2 HOURS</span>
+                    </div>
+                    <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold transition-all transform active:scale-95">
+                        START BOT
+                    </button>
+                </div>
             </div>
-            <p id="no-groups" style="display:none;">No managed groups found or permissions not granted.</p>
+
+            <!-- Right Column: Status & Logs -->
+            <div class="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700 flex flex-col">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-terminal mr-2"></i> Activity Log
+                </h2>
+
+                <div id="timerDisplay" class="mb-4 text-center p-4 bg-slate-900 rounded-lg border border-slate-700">
+                    <div class="text-xs text-slate-500 uppercase">Next Post In</div>
+                    <div id="countdown" class="text-3xl font-mono font-bold text-yellow-500">00:00:00</div>
+                </div>
+
+                <div id="logWindow" class="flex-grow overflow-y-auto h-64 bg-black p-4 rounded-lg font-mono text-xs space-y-2">
+                    <p class="text-slate-500">> System ready...</p>
+                </div>
+
+                <button id="stopBtn" class="mt-4 w-full bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white border border-red-600/50 py-2 rounded-lg transition-all">
+                    STOP BOT
+                </button>
+            </div>
         </div>
-
-        <button class="post-button" onclick="postToSelectedGroups()">Post to Selected Groups</button>
     </div>
 
-    <div class="message-log">
-        <h2>Post Log:</h2>
-        <div id="log-output"></div>
-    </div>
-
-    <!-- Facebook SDK for JavaScript -->
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
     <script src="app.js"></script>
-
 </body>
 </html>
